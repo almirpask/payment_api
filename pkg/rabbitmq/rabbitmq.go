@@ -9,7 +9,7 @@ import (
 )
 
 func OpenChannel() (*amqp.Channel, error) {
-	conn, err := amqp.Dial("amqp://admin:admin@rabbitmq:5672/")
+	conn, err := amqp.Dial("amqp://admin:admin@rabbitmq:5672")
 
 	if err != nil {
 		panic(err)
@@ -33,7 +33,8 @@ func Consume(ch *amqp.Channel, out chan amqp.Delivery, queue string, exchange st
 		return err
 	}
 
-	exchangeName := fmt.Sprintf("Variable string %s content", exchange)
+	exchangeName := fmt.Sprintf("amq.%s", exchange)
+	println("Exchange name: ", exchangeName)
 
 	if err != nil {
 		slog.Error("Failed to create exchange name : %s", err)
