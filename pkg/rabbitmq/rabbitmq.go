@@ -7,7 +7,7 @@ import (
 )
 
 func OpenChannel() (*amqp.Channel, error) {
-	conn, err := amqp.Dial("amqp://guest:guest@localhost:5672/")
+	conn, err := amqp.Dial("amqp://admin:admin@rabbitmq:5672/")
 
 	if err != nil {
 		panic(err)
@@ -44,7 +44,7 @@ func Consume(ch *amqp.Channel, out chan amqp.Delivery, queue string) error {
 }
 
 func Publish(ctx context.Context, ch *amqp.Channel, body, exchange string) error {
-	err := ch.PublishWithContext(ctx, exchange, "", false, false, amqp.Publishing{
+	err := ch.PublishWithContext(ctx, exchange, "PaymentDone", false, false, amqp.Publishing{
 		ContentType: "text/json",
 		Body:        []byte(body),
 	})
