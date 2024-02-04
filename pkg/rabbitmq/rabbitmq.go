@@ -2,6 +2,7 @@ package rabbitmq
 
 import (
 	"context"
+	"fmt"
 	"log/slog"
 
 	amqp "github.com/rabbitmq/amqp091-go"
@@ -24,23 +25,7 @@ func OpenChannel() (*amqp.Channel, error) {
 
 func Consume(ch *amqp.Channel, out chan amqp.Delivery, queue string, exchange string, routingKey string) error {
 
-	err := ch.ExchangeDeclare(
-		exchange,
-		"direct",
-		true,
-		false,
-		false,
-		false,
-		nil,
-	)
-
-	if err != nil {
-		slog.Error("Failed to declare exchange: %s", err)
-		slog.Error(err.Error())
-		return err
-	}
-
-	err = ch.ExchangeDeclare(queue, "direct", true, false, false, false, nil)
+	_, err := ch.QueueDeclare(queue, true, false, false, false, nil)
 
 	if err != nil {
 		slog.Error("Failed to declare a queue: %s", err)
@@ -48,15 +33,15 @@ func Consume(ch *amqp.Channel, out chan amqp.Delivery, queue string, exchange st
 		return err
 	}
 
-	_, err = ch.QueueDeclare(queue, true, false, false, false, nil)
+	exchangeName := fmt.Sprintf("Variable string %s content", exchange)
 
 	if err != nil {
-		slog.Error("Failed to declare a queue: %s", err)
+		slog.Error("Failed to create exchange name : %s", err)
 		slog.Error(err.Error())
 		return err
 	}
 
-	err = ch.QueueBind(queue, routingKey, exchange, false, nil)
+	err = ch.QueueBind(queue, routingKey, exchangeName, false, nil)
 
 	if err != nil {
 		slog.Error("Failed to bind: %s", err)
