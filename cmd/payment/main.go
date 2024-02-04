@@ -21,7 +21,7 @@ func main() {
 
 	msgs := make(chan amqp.Delivery)
 
-	go rabbitmq.Consume(ch, msgs, "orders")
+	go rabbitmq.Consume(ch, msgs, "orders", "direct", "OrderCreated")
 
 	for msg := range msgs {
 		var orderRequest entity.OrderRequest
